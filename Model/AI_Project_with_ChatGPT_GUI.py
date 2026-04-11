@@ -12,16 +12,17 @@ class TkinterApp:
         master.title("Food Recipe Finder")
 
         # Initialize model and API URLs.
-        self.model_path = '/content/drive/MyDrive/ingredients7/weights/best.onnx'
+        self.model_path = './ingredientsRun/weights/best.onnx'
         self.yolo_model = YOLO(self.model_path, task = 'detect')
         self.ingredient_url = 'https://www.themealdb.com/api/json/v2/65232507/filter.php?i='
         self.recipe_url = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i='
         
         # OpenAI API Key (replace with your actual key).
-        self.OPENAI_API_KEY = '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'
+        self.OPENAI_API_KEY = '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'
         self.OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
 
         self.detected_ingredients = set()
+        self.comma_separated_ingredients = ""
 
         # --- UI Elements ---
 
@@ -36,7 +37,7 @@ class TkinterApp:
         self.image_label.pack(pady = 5)
 
         # Detected Ingredients Section.
-        self.ingredients_frame = ttk.LabelFrame(master, text = "2. Detected Ingredients")
+        self.ingredients_frame = ttk.LabelFrame(master, text = "2. Detected Ingredients (You May add more after detection.)")
         self.ingredients_frame.pack(padx = 10, pady = 10, fill = "x")
 
         self.ingredients_text_box = tk.Text(self.ingredients_frame, height = 5, width = 50)
@@ -50,9 +51,10 @@ class TkinterApp:
 
         self.find_recipe_button = ttk.Button(self.actions_frame, text = "Find Recipes (TheMealDB)", command=self.find_recipes)
         self.find_recipe_button.pack(side = tk.LEFT, padx = 5, pady = 5)
+        self.find_recipe_button.pack_forget()
 
         self.chatgpt_button = ttk.Button(self.actions_frame, text = "Ask ChatGPT for Ideas", command = self.ask_chatgpt)
-        self.chatgpt_button.pack(side=tk.LEFT, padx = 5, pady = 5)
+        self.chatgpt_button.pack(side = tk.LEFT, padx = 5, pady = 5)
 
         # Results Display.
         self.results_frame = ttk.LabelFrame(master, text = "4. Results")
@@ -68,7 +70,7 @@ class TkinterApp:
         if not append:
             text_widget.delete(1.0, tk.END)
         text_widget.insert(tk.END, content)
-        text_widget.config(state = tk.DISABLED)
+        #text_widget.config(state = tk.DISABLED)
         text_widget.see(tk.END) # Scroll to end.
 
     def upload_image(self):
@@ -84,7 +86,7 @@ class TkinterApp:
             except Exception as e:
                 self.update_text_box(self.results_text, f"Error loading or processing image: {e}\n", append=True)
 
-    def display_image(self, img_pil, label_widget, max_size = (640, 640)):
+    def display_image(self, img_pil, label_widget, max_size = (320, 320)):
         img_pil.thumbnail(max_size, Image.Resampling.LANCZOS)
         img_tk = ImageTk.PhotoImage(img_pil)
         label_widget.config(image=img_tk)
@@ -130,8 +132,12 @@ class TkinterApp:
             self.update_text_box(self.results_text, "No ingredients detected. Please upload an image first.\n", append=True)
             return
 
-        comma_separated_ingredients = ', '.join(sorted(list(self.detected_ingredients)))
-        full_ingredient_url = self.ingredient_url + comma_separated_ingredients
+        #self.comma_separated_ingredients = ', '.join(sorted(list(self.detected_ingredients)))
+        self.comma_separated_ingredients = self.ingredients_text_box.get('1.0', tk.END).replace('\n', ', ')
+        full_ingredient_url = self.ingredient_url + self.comma_separated_ingredients[:-2]
+        #full_ingredient_url = self.ingredient_url + self.comma_separated_ingredients
+        self.update_text_box(self.results_text, f"Searching for recipes with: {self.comma_separated_ingredients}\n\n")
+        self.update_text_box(self.results_text, f"Asking for recipes at: {full_ingredient_url}\n\n")
 
         try:
             response = requests.get(full_ingredient_url)
@@ -181,7 +187,7 @@ class TkinterApp:
                 {'role': 'user', 'content': prompt_text}
             ],
             'temperature': 0.7,
-            'max_tokens': 500 # Increased max_tokens for better recipe descriptions
+            'max_tokens': 1000 # Increased max_tokens for better recipe descriptions
         }
 
         try:
@@ -202,12 +208,17 @@ class TkinterApp:
     def ask_chatgpt(self):
         self.update_text_box(self.results_text, "Asking ChatGPT for recipe ideas...\n")
         if not self.detected_ingredients:
-            self.update_text_box(self.results_text, "No ingredients detected. Please upload an image first.\n", append=True)
+            self.update_text_box(self.results_text, "No ingredients detected. Please upload an image first.\n", append = True)
             return
         
-        comma_separated_ingredients = ', '.join(sorted(list(self.detected_ingredients)))
-        prompt = f"Given only these ingredients: {comma_separated_ingredients}. What are some recipe ideas? Please provide a simple recipe for one idea.\n"
+        self.comma_separated_ingredients = self.ingredients_text_box.get('1.0', tk.END).replace('\n', ', ')
+        self.comma_separated_ingredients = self.comma_separated_ingredients[:-2]  //Remove the trailing ','.
+
+        prompt = f"Given only these ingredients: {self.comma_separated_ingredients}. What are some recipe ideas? Please provide two simple recipes for some ideas.\n"
         
+        self.update_text_box(self.results_text, f"Searching for recipes with: {self.comma_separated_ingredients}\n\n")
+        self.update_text_box(self.results_text, f"Asking for recipes from ChatGPT:\n {prompt}\n")
+
         chatgpt_answer = self.call_chatgpt_api(prompt)
         self.update_text_box(self.results_text, "\nChatGPT's response:\n", append=True)
         self.update_text_box(self.results_text, chatgpt_answer + "\n\n", append=True)

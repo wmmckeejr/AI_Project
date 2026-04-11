@@ -1,0 +1,142 @@
+description: Ultralytics YOLO26n model trained on /home/jetson/Desktop/Project/INGREDIENTS/data.yaml
+author: Ultralytics
+date: '2026-04-09T15:47:15.182845'
+version: 8.4.33
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: Akabare_Khursani
+  1: Apple
+  2: Artichoke
+  3: Ash_Gourd
+  4: Asparagus
+  5: Avocado
+  6: Bacon
+  7: Bamboo_Shoots
+  8: Banana
+  9: Beans
+  10: Beaten_Rice
+  11: Beef
+  12: Beetroot
+  13: Bethu_ko_Saag
+  14: Bitter_Gourd
+  15: Black_Lentils
+  16: Black_beans
+  17: Bottle_Gourd
+  18: Bread
+  19: Brinjal
+  20: Broad_Beans
+  21: Broccoli
+  22: Buff_Meat
+  23: Butter
+  24: Cabbage
+  25: Capsicum
+  26: Carrot
+  27: Cassava
+  28: Cauliflower
+  29: Chayote
+  30: Cheese
+  31: Chicken
+  32: Chicken_Gizzards
+  33: Chickpeas
+  34: Chili_Pepper
+  35: Chili_Powder
+  36: Chowmein_Noodles
+  37: Cinnamon
+  38: Coriander
+  39: Corn
+  40: Cornflakes
+  41: Crab_Meat
+  42: Cucumber
+  43: Egg
+  44: Farsi_ko_Munta
+  45: Fiddlehead_Ferns
+  46: Fish
+  47: Garden_Peas
+  48: Garden_cress
+  49: Garlic
+  50: Ginger
+  51: Green_Brinjal
+  52: Green_Lentils
+  53: Green_Mint
+  54: Green_Peas
+  55: Green_Soyabean
+  56: Gundruk
+  57: Ham
+  58: Ice
+  59: Jack_Fruit
+  60: Ketchup
+  61: Lapsi
+  62: Lemon
+  63: Lime
+  64: Long_Beans
+  65: Masyaura
+  66: Milk
+  67: Minced_Meat
+  68: Moringa_Leaves
+  69: Mushroom
+  70: Mutton
+  71: Nutrela
+  72: Okra
+  73: Olive_Oil
+  74: Onion
+  75: Onion_Leaves
+  76: Orange
+  77: Palak
+  78: Palungo
+  79: Paneer
+  80: Papaya
+  81: Pea
+  82: Pear
+  83: Pointed_Gourd
+  84: Pork
+  85: Potato
+  86: Pumpkin
+  87: Radish
+  88: Rahar_ko_Daal
+  89: Rayo_ko_Saag
+  90: Red_Beans
+  91: Red_Lentils
+  92: Rice
+  93: Sajjyun
+  94: Salt
+  95: Sausage
+  96: Snake_Gourd
+  97: Soy_Sauce
+  98: Soyabean
+  99: Sponge_Gourd
+  100: Stinging_Nettle
+  101: Strawberry
+  102: Sugar
+  103: Sweet_Potato
+  104: Taro_Leaves
+  105: Taro_Root
+  106: Thukpa_Noodles
+  107: Tofu
+  108: Tomato
+  109: Tori_ko_Saag
+  110: Tree_Tomato
+  111: Turnip
+  112: Walnut
+  113: Watermelon
+  114: Wheat
+  115: Yellow_Lentils
+  116: kimchi
+  117: mayonnaise
+  118: noodle
+  119: seaweed
+args:
+  batch: 1
+  fraction: 1.0
+  half: false
+  int8: false
+  dynamic: true
+  nms: false
+channels: 3
+end2end: true
