@@ -18,7 +18,7 @@ class TkinterApp:
         self.recipe_url = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i='
         
         # OpenAI API Key (replace with your actual key).
-        self.OPENAI_API_KEY = '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'
+        self.OPENAI_API_KEY = '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'
         self.OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
 
         self.detected_ingredients = set()
@@ -186,8 +186,8 @@ class TkinterApp:
                 {'role': 'system', 'content': 'You are a helpful assistant that provides cooking advice and recipe suggestions.'},
                 {'role': 'user', 'content': prompt_text}
             ],
-            'temperature': 0.7,
-            'max_tokens': 1000 # Increased max_tokens for better recipe descriptions
+            'temperature': 0.9, # Controls randomness. Lower is more deterministic.
+            'max_tokens': 1000  # Increased max_tokens for better recipe descriptions.
         }
 
         try:
@@ -212,7 +212,7 @@ class TkinterApp:
             return
         
         self.comma_separated_ingredients = self.ingredients_text_box.get('1.0', tk.END).replace('\n', ', ')
-        self.comma_separated_ingredients = self.comma_separated_ingredients[:-2]  //Remove the trailing ','.
+        self.comma_separated_ingredients = self.comma_separated_ingredients[:-2]  #Remove the trailing ','.
 
         prompt = f"Given only these ingredients: {self.comma_separated_ingredients}. What are some recipe ideas? Please provide two simple recipes for some ideas.\n"
         
@@ -220,8 +220,8 @@ class TkinterApp:
         self.update_text_box(self.results_text, f"Asking for recipes from ChatGPT:\n {prompt}\n")
 
         chatgpt_answer = self.call_chatgpt_api(prompt)
-        self.update_text_box(self.results_text, "\nChatGPT's response:\n", append=True)
-        self.update_text_box(self.results_text, chatgpt_answer + "\n\n", append=True)
+        self.update_text_box(self.results_text, "\nChatGPT's response:\n", append = True)
+        self.update_text_box(self.results_text, chatgpt_answer + "\n\n", append = True)
 
 # Run the Tkinter application
 if __name__ == '__main__':
