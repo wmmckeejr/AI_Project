@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, ttk
 from PIL import Image, ImageTk
 import io
+import os
 import requests
 import json
 from ultralytics import YOLO
@@ -16,9 +17,12 @@ class TkinterApp:
         self.yolo_model = YOLO(self.model_path, task = 'detect')
         self.ingredient_url = 'https://www.themealdb.com/api/json/v2/65232507/filter.php?i='
         self.recipe_url = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i='
-        
-        # OpenAI API Key (replace with your actual key).
-        self.OPENAI_API_KEY = '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'
+
+        # Retrieve API key from environment variable.
+        # It's recommended to store your API key securely, e.g., using Colab's Secrets feature.
+        # For testing, you can set it like: os.environ["OPENAI_API_KEY"] = "your_key_here"
+        self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
         self.OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
 
         self.detected_ingredients = set()
@@ -41,9 +45,25 @@ class TkinterApp:
         self.ingredients_frame.pack(padx = 10, pady = 10, fill = "x")
 
         self.ingredients_text_box = tk.Text(self.ingredients_frame, height = 5, width = 50)
-        self.ingredients_text_box.pack(pady=5, padx = 5, fill = "x", expand = True)
+        self.ingredients_text_box.pack(pady = 5, padx = 5, fill = "x", expand = True)
         self.ingredients_text_box.insert(tk.END, "Detected ingredients will appear here...")
-        self.ingredients_text_box.config(state=tk.DISABLED) # Make it read-only initially.
+        self.ingredients_text_box.config(state = tk.DISABLED) # Make it read-only initially.
+
+        # Create a label for the API.
+        self.API_label = tk.Label(root, text = "Enter your OpenAI API Key:")
+        self.API_label.pack(pady = 10)
+        self.API_label.pack_forget()
+
+        # Create a text box for the API key.
+        self.api_key_text = tk.Text(root, wrap = tk.WORD, height = 2)
+        self.api_key_text.pack(pady = 5, padx = 10)
+        self.api_key_text.config(state = tk.NORMAL)
+        self.api_key_text.pack_forget()
+
+        # Create a button to retrieve the API key.
+        self.retrieve_API_button = ttk.Button(root, text = "Get API Key", command = self.get_api_key)
+        self.retrieve_API_button.pack(pady = 10)
+        self.retrieve_API_button.pack_forget()
 
         # Recipe and ChatGPT Actions.
         self.actions_frame = ttk.LabelFrame(master, text = "3. Actions")
@@ -58,12 +78,25 @@ class TkinterApp:
 
         # Results Display.
         self.results_frame = ttk.LabelFrame(master, text = "4. Results")
-        self.results_frame.pack(padx = 10, pady = 10, fill = "both", expand=True)
+        self.results_frame.pack(padx = 10, pady = 10, fill = "both", expand = True)
 
         self.results_text = tk.Text(self.results_frame, wrap = tk.WORD, height = 15)
-        self.results_text.pack(pady=5, padx = 5, fill = "both", expand=True)
+        self.results_text.pack(pady = 5, padx = 5, fill = "both", expand=True)
         self.results_text.insert(tk.END, "Recipe and ChatGPT results will appear here.")
-        self.results_text.config(state=tk.DISABLED) # Make it read-only
+        self.results_text.config(state = tk.DISABLED) # Make it read-only
+
+    def get_api_key(self):
+        api_key = self.api_key_text.get("1.0", tk.END).strip()
+        if api_key:
+            self.OPENAI_API_KEY = api_key
+            self.results_text.insert(tk.END, "API Key retrieved.")
+
+            # Hide the API widgets.
+            self.API_label.pack_forget()
+            self.api_key_text.pack_forget()
+            self.retrieve_API_button.pack_forget()
+        else:
+            self.results_text.insert(tk.END, "API Key text box is empty.")
 
     def update_text_box(self, text_widget, content, append = False):
         text_widget.config(state = tk.NORMAL)
@@ -113,7 +146,7 @@ class TkinterApp:
                 self.detected_ingredients = detected_unique_items
                 ingredients_str = '\n'.join(sorted(list(detected_unique_items)))
                 self.update_text_box(self.ingredients_text_box, ingredients_str)
-                self.update_text_box(self.results_text, f"Detected: {', '.join(sorted(list(detected_unique_items)))}\n", append=True)
+                self.update_text_box(self.results_text, f"Detected: {', '.join(sorted(list(detected_unique_items)))}\n", append = True)
             else:
                 self.update_text_box(self.ingredients_text_box, "No objects detected.")
                 self.update_text_box(self.results_text, "No objects detected.\n", append=True)
@@ -132,7 +165,6 @@ class TkinterApp:
             self.update_text_box(self.results_text, "No ingredients detected. Please upload an image first.\n", append=True)
             return
 
-        #self.comma_separated_ingredients = ', '.join(sorted(list(self.detected_ingredients)))
         self.comma_separated_ingredients = self.ingredients_text_box.get('1.0', tk.END).replace('\n', ', ')
         full_ingredient_url = self.ingredient_url + self.comma_separated_ingredients[:-2]
         #full_ingredient_url = self.ingredient_url + self.comma_separated_ingredients
@@ -176,6 +208,17 @@ class TkinterApp:
             self.update_text_box(self.results_text, "Failed to decode JSON from API response.\n", append = True)
 
     def call_chatgpt_api(self, prompt_text):
+        # Ensure there is a key.
+        if self.OPENAI_API_KEY is None:
+            self.results_text.insert(tk.END, "WARNING: OPENAI_API_KEY environment variable not found. Please set it.")
+
+            # Unhide the API widgets.
+            self.API_label.pack()
+            self.api_key_text.pack()
+            self.retrieve_API_button.pack()
+        else:
+            self.results_text.insert(tk.END, f"OPENAI_API_KEY loaded successfully from environment variables {self.OPENAI_API_KEY}.")
+
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.OPENAI_API_KEY}'
@@ -213,7 +256,7 @@ class TkinterApp:
         
         self.comma_separated_ingredients = self.ingredients_text_box.get('1.0', tk.END).replace('\n', ', ') # Place ingredients into a single comma separated line.
         self.comma_separated_ingredients = self.ingredients_text_box.get('1.0', tk.END).replace('_', ' ') # Replace any underscores with spaces.
-        self.comma_separated_ingredients = self.comma_separated_ingredients[:-2]  #Remove the trailing ','.
+        self.comma_separated_ingredients = self.comma_separated_ingredients[:-1]  #Remove the trailing ','.
 
         prompt = f"Given only these ingredients: {self.comma_separated_ingredients}. What are some recipe ideas? Please provide two simple recipes for some ideas.\n"
         
