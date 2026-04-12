@@ -18,7 +18,7 @@ class TkinterApp:
         self.recipe_url = 'https://www.themealdb.com/api/json/v1/1/lookup.php?i='
         
         # OpenAI API Key (replace with your actual key).
-        self.OPENAI_API_KEY = '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'
+        self.OPENAI_API_KEY = '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'
         self.OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
 
         self.detected_ingredients = set()
@@ -211,7 +211,8 @@ class TkinterApp:
             self.update_text_box(self.results_text, "No ingredients detected. Please upload an image first.\n", append = True)
             return
         
-        self.comma_separated_ingredients = self.ingredients_text_box.get('1.0', tk.END).replace('\n', ', ')
+        self.comma_separated_ingredients = self.ingredients_text_box.get('1.0', tk.END).replace('\n', ', ') # Place ingredients into a single comma separated line.
+        self.comma_separated_ingredients = self.ingredients_text_box.get('1.0', tk.END).replace('_', ' ') # Replace any underscores with spaces.
         self.comma_separated_ingredients = self.comma_separated_ingredients[:-2]  #Remove the trailing ','.
 
         prompt = f"Given only these ingredients: {self.comma_separated_ingredients}. What are some recipe ideas? Please provide two simple recipes for some ideas.\n"
