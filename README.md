@@ -4,7 +4,7 @@ This project will use an object detection model using Yolo (1) and a yaml datase
 
 The Yolo model is created using 150 epochs.  The item names in the yaml file were updated to follow the naming convention need by the webiste.  A Thor Jetson (5) (which is designed for A.I. using an Nvidia graphics card) was used in training the model.  It still took hours to complete the training.  I have run the training multiple times using different epoch counts, and each time gives differing results.
 
-Run this command in a terminal/shell: python ./AI_Project_with_ChatGPT_GUI.py
+Run this command in a terminal/shell from the directory where the script resides: python ./AI_Project_with_ChatGPT_GUI.py
 
 The create_model_food.py was used to train the model using the Jetson Thor (5).
 References:
