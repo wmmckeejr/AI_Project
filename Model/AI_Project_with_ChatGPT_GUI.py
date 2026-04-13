@@ -217,7 +217,8 @@ class TkinterApp:
             self.api_key_text.pack()
             self.retrieve_API_button.pack()
         else:
-            self.results_text.insert(tk.END, f"OPENAI_API_KEY loaded successfully from environment variables {self.OPENAI_API_KEY}.")
+            #self.results_text.insert(tk.END, f"OPENAI_API_KEY loaded successfully from environment variables {self.OPENAI_API_KEY}.")
+            self.results_text.insert(tk.END, "OPENAI_API_KEY loaded successfully from environment variables.")
 
         headers = {
             'Content-Type': 'application/json',
