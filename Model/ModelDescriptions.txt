@@ -1,0 +1,4 @@
+IngredientsRun used 150 epochs.
+IngredientsRun2 used 200 epochs.
+IngredientsRun3 used 50 epochs.
+IngredientsRun4 used 100 epochs.
